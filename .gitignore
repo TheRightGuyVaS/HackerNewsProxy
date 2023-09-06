@@ -1,0 +1,13 @@
+.vs/*
+src/*/Properties/launchSettings.json
+.vscode/*
+*.iml
+*/.idea/
+src/*/bin
+src/*/obj
+src/*/.vs
+test/*/bin
+test/*/obj
+.artifacts/*
+src/**/*.user
+*/project.lock.json
