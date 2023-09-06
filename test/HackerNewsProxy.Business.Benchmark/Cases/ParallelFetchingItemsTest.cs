@@ -15,7 +15,7 @@ public class ParallelFetchingItemsTest
     public async Task GlobalSetup()
     {
         ApiClient = new ApiClientMock(CountOfItems);
-        StoryIds = await ApiClient.GetBestItemIdsAsync();
+        ItemIds = await ApiClient.GetBestItemIdsAsync();
     }
 
 #pragma warning disable CS8618
@@ -23,7 +23,7 @@ public class ParallelFetchingItemsTest
 #pragma warning restore CS8618
     
 #pragma warning disable CS8618
-    private long[] StoryIds { get; set; }
+    private long[] ItemIds { get; set; }
 #pragma warning restore CS8618
 
     [Benchmark]
@@ -32,7 +32,7 @@ public class ParallelFetchingItemsTest
         var result = new ItemResponse[CountOfItems];
 
         var tasks = new Task[CountOfItems];
-        for (var i = 0; i < Math.Min(StoryIds.Length, CountOfItems); i++)
+        for (var i = 0; i < Math.Min(ItemIds.Length, CountOfItems); i++)
         {
             tasks[i] = SetItemToArrayById(i, result);
         }
@@ -44,7 +44,7 @@ public class ParallelFetchingItemsTest
     
     private async Task SetItemToArrayById(int i, ItemResponse[] arr)
     {
-        arr[i] = await ApiClient.GetItemByIdAsync(StoryIds[i]);
+        arr[i] = await ApiClient.GetItemByIdAsync(ItemIds[i]);
     }
 
     [Benchmark]
@@ -54,7 +54,7 @@ public class ParallelFetchingItemsTest
 
         Parallel.For(0, CountOfItems, (i, _) =>
         {
-            result[i] = ApiClient.GetItemByIdAsync(StoryIds[i]).GetAwaiter().GetResult();
+            result[i] = ApiClient.GetItemByIdAsync(ItemIds[i]).GetAwaiter().GetResult();
         });
 
         return Task.FromResult<ICollection<ItemResponse>>(result);

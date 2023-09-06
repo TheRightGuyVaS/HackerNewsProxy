@@ -8,12 +8,12 @@ namespace HackerNewsProxy.Api.Controllers;
 [Route("stories")]
 public class StoriesController : Controller
 {
-    private readonly IStoryService _storyService;
+    private readonly IItemService _itemService;
     private readonly IMapper _mapper;
 
-    public StoriesController(IStoryService storyService, IMapper mapper)
+    public StoriesController(IItemService itemService, IMapper mapper)
     {
-        _storyService = storyService;
+        _itemService = itemService;
         _mapper = mapper;
     }
 
@@ -21,7 +21,7 @@ public class StoriesController : Controller
     [ProducesResponseType(typeof(ItemModel[]), 200)]
     public async Task<JsonResult> GetBestStories(int amount)
     {
-        var stories = await this._storyService.GetTopStoriesAsync(amount);
+        var stories = await this._itemService.GetTopItemsByScoreAsync(amount);
         return Json(_mapper.Map<ItemModel[]>(stories));
     }
 }

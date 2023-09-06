@@ -18,114 +18,114 @@ namespace HackerNewsProxy.Business.UnitTests.Services;
 public class StoriesServiceTest
 {
     private readonly IApiClient _apiClient;
-    private readonly IStoryService _storyService;
+    private readonly IItemService _itemService;
 
     public StoriesServiceTest()
     {
         _apiClient = Substitute.For<IApiClient>();
-        _storyService =
-            new StoryService(_apiClient, MemoryCacheHelper.Cache);
+        _itemService =
+            new ItemCacheService(_apiClient, MemoryCacheHelper.Cache);
     }
 
     [Fact]
-    public async Task ShouldCacheStories()
+    public async Task ShouldCacheItems()
     {
         //arrange
-        const long storyId = 1;
-        _apiClient.GetBestItemIdsAsync().Returns(new[] { storyId });
-        _apiClient.GetItemByIdAsync(storyId).Returns(new ItemResponse
+        const long itemId = 1;
+        _apiClient.GetBestItemIdsAsync().Returns(new[] { itemId });
+        _apiClient.GetItemByIdAsync(itemId).Returns(new ItemResponse
         {
-            Id = storyId,
+            Id = itemId,
             Score = int.MaxValue
         });
 
         //act
-        await _storyService.GetTopStoriesAsync(1);
-        var bestStories = await _storyService.GetTopStoriesAsync(1);
+        await _itemService.GetTopItemsByScoreAsync(1);
+        var bestStories = await _itemService.GetTopItemsByScoreAsync(1);
 
         //assert
         using (new AssertionScope())
         {
             bestStories.Should().NotBeEmpty();
             bestStories.Count.Should().Be(1);
-            bestStories.Single().Id.Should().Be(storyId);
+            bestStories.Single().Id.Should().Be(itemId);
 
             await _apiClient.Received(1).GetBestItemIdsAsync();
-            await _apiClient.Received(1).GetItemByIdAsync(storyId);
+            await _apiClient.Received(1).GetItemByIdAsync(itemId);
         }
     }
 
     [Fact]
-    public void ShouldHandleNoStories()
+    public void ShouldHandleNoItems()
     {
         //arrange
         _apiClient.GetBestItemIdsAsync().Returns(Array.Empty<long>());
 
         //act
-        var act = async () => await _storyService.GetTopStoriesAsync(1);
+        var act = async () => await _itemService.GetTopItemsByScoreAsync(1);
 
         //assert
         act.Should().NotThrowAsync();
     }
 
     [Fact]
-    public void ShouldHandleNullStories()
+    public void ShouldHandleNullItems()
     {
         //arrange
         _apiClient.GetBestItemIdsAsync().ReturnsNull();
 
         //act
-        var act = async () => await _storyService.GetTopStoriesAsync(1);
+        var act = async () => await _itemService.GetTopItemsByScoreAsync(1);
 
         //assert
         act.Should().NotThrowAsync();
     }
 
     [Fact]
-    public void ShouldHandleStoryReturnedAsNull()
+    public void ShouldHandleItemReturnedAsNull()
     {
         //arrange
-        const long storyId = 1;
-        _apiClient.GetBestItemIdsAsync().Returns(new[] { storyId });
-        _apiClient.GetItemByIdAsync(storyId).ReturnsNull();
+        const long itemId = 1;
+        _apiClient.GetBestItemIdsAsync().Returns(new[] { itemId });
+        _apiClient.GetItemByIdAsync(itemId).ReturnsNull();
 
         //act
-        var act = async () => await _storyService.GetTopStoriesAsync(1);
+        var act = async () => await _itemService.GetTopItemsByScoreAsync(1);
 
         //assert
         act.Should().NotThrowAsync();
     }
 
     [Fact]
-    public async Task ShouldHandleStoriesWithSameScore()
+    public async Task ShouldHandleItemsWithSameScore()
     {
         //arrange
         const int score = 1;
-        const long story1Id = 2;
-        const long story2Id = 3;
+        const long item1Id = 2;
+        const long item2Id = 3;
 
-        _apiClient.GetBestItemIdsAsync().Returns(new[] { story1Id, story2Id });
-        _apiClient.GetItemByIdAsync(story1Id).Returns(new ItemResponse
+        _apiClient.GetBestItemIdsAsync().Returns(new[] { item1Id, item2Id });
+        _apiClient.GetItemByIdAsync(item1Id).Returns(new ItemResponse
         {
-            Id = story1Id,
+            Id = item1Id,
             Score = score
         });
-        _apiClient.GetItemByIdAsync(story2Id).Returns(new ItemResponse
+        _apiClient.GetItemByIdAsync(item2Id).Returns(new ItemResponse
         {
-            Id = story2Id,
+            Id = item2Id,
             Score = score
         });
         
         //act
-        ICollection<ItemResponse> stories = new List<ItemResponse>();
-        var act = async () => stories = await _storyService.GetTopStoriesAsync(2);
+        ICollection<ItemResponse> items = new List<ItemResponse>();
+        var act = async () => items = await _itemService.GetTopItemsByScoreAsync(2);
         
         //assert
         using (new AssertionScope())
         {
             await act.Should().NotThrowAsync();
-            stories.Count.Should().Be(2);
-            stories.Select(x => x.Id).Should().BeEquivalentTo(new[] { story1Id, story2Id });
+            items.Count.Should().Be(2);
+            items.Select(x => x.Id).Should().BeEquivalentTo(new[] { item1Id, item2Id });
         }
     }
 }

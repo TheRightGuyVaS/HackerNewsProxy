@@ -44,6 +44,19 @@ Models definition:
     - **HackerNewsProxy.Business.UnitTests** - xUnit Test Project for the **HackerNewsProxy.Business** project
     - **HackerNewsProxy.Console.UnitTests** - xUnit Test Project for the **HackerNewsProxy.Console** project
 
+## Main enhancements
+
+- Using ``MemoryCache`` to cache fetched items for 30 minutes, so next calls with less items to fetch than before will use values from cache. For calls with number of items to get application will fetch from Hacker New API only missing ones.
+- Using ``AutoMapper`` gives us full controll on mapping entieties, with veryfiyng correct mapping and getting notified when code modified and mapping should not work without changes.
+- Using ``Parallel`` library allows us to fetch data from Hacker New API in most efficient way, using as many threads as available on the server.
+- Using ``BenchmarkDotNet`` allows us to understand which approach can give us more efficiency and how it depends on data scale.
+- Using **DependencyInjectionContainerTest** for each project can notify us about missing service registrations, which reduced time, cost and chance of fail of CI/CD process.
+- Using ``Polly`` retry policies allows us to prevent failing due to from time to time Hacker New API method failing with Timeouts or other exceptions.
+
 ## Sources of knowledge
 
  - https://github.com/HackerNews/API
+
+## Additional thoughts
+
+- Throwing exception when Hacker New API returns us **null** during fetching item by id can be changed into handling it. When we need to fetch **n** best stories we fetch them, check if they are not **null**, and stop not only after predefined number of iterations (NASA would say it is awful) but when either we ran out of item ids or we fetched needed amount of items.

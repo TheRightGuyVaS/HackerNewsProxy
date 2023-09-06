@@ -11,7 +11,7 @@ public static class DependencyInjectionModule
     {
         HackerNews.Api.SDK.DependencyInjectionModule.ConfigureServices(serviceCollection);
         serviceCollection.AddMemoryCache();
-        serviceCollection.AddScoped<IStoryService, StoryService>();
+        serviceCollection.AddScoped<IItemService, ItemCacheService>();
         serviceCollection.AddSingleton(ConfigureMapper(automapperProfileTypes));
     }
 
