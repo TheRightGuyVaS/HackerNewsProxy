@@ -2,7 +2,7 @@
 src/*/Properties/launchSettings.json
 .vscode/*
 *.iml
-*/.idea/
+*.idea/
 src/*/bin
 src/*/obj
 src/*/.vs
@@ -11,3 +11,4 @@ test/*/obj
 .artifacts/*
 src/**/*.user
 */project.lock.json
+*BenchmarkDotNet.Artifacts/
