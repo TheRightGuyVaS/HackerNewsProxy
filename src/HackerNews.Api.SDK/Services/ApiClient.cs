@@ -29,6 +29,7 @@ internal class ApiClient : IApiClient
         .Handle<HttpRequestException>(exception => exception.StatusCode == HttpStatusCode.GatewayTimeout)
         .WaitAndRetryAsync(10, _ => TimeSpan.FromMilliseconds(100));
     
+    
     private readonly HttpClient _httpClient;
     
     public ApiClient()
